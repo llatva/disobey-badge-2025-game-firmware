@@ -1084,7 +1084,8 @@ class SoftUART:
                 return None
         
         # Wait for middle of start bit
-        # Note: Timing calibration may be necessary for reliable UART communication
+        # Note: Timing calibration may be necessary for reliable UART communication.
+        # See "UART Performance Considerations" section for timing accuracy details.
         time.sleep_us(self.bit_time_us // 2)
         
         # Verify start bit
