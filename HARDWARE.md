@@ -150,6 +150,18 @@ Detailed connection diagrams are available in [DEVELOPMENT.md](DEVELOPMENT.md) a
 - Expansion connector specifications
 - Power budget considerations
 
+### SAO (Simple Add-On) Support
+
+The badge supports SAO (Simple Add-On) devices through I2C and GPIO expansion:
+
+- **SAO Connector**: Standard 6-pin header with I2C and 2 GPIO pins
+- **EEPROM Detection**: Auto-detect SAOs via I2C EEPROM at address 0x50
+- **Driver Development**: See [docs/SAO.md](docs/SAO.md) for complete guide on:
+  - Writing SAO drivers with I2C communication
+  - Utilizing GPIO pins for digital I/O, PWM, and interrupts
+  - Implementing software UART over SAO GPIO pins
+  - Integrating SAO drivers into badge firmware
+
 ### Firmware Compatibility
 
 - Ensure hardware modifications are compatible with firmware
