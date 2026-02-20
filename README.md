@@ -92,6 +92,7 @@ If you encounter issues, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for soluti
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Detailed development guide, testing, and hardware setup
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common problems and solutions
 - **[docs/game_development.md](docs/game_development.md)** - Game development guide and widget usage
+- **[docs/SAO.md](docs/SAO.md)** - SAO (Simple Add-On) driver development guide with GPIO and UART
 - **[docs/image_conversion.md](docs/image_conversion.md)** - Converting images for the badge display (use RGB565_I format)
 
 ## Project Structure
