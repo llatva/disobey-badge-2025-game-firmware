@@ -7,6 +7,11 @@ ifeq ($(PYTHON),)
 $(error Python is not installed. Please install Python 3)
 endif
 
+# Docker CLI defaults (no Docker Desktop required)
+DOCKER ?= docker
+DOCKER_IMAGE ?= disobey-badge-firmware:cli
+DOCKERFILE_CLI ?= Dockerfile.rootless
+
 # Default value for FW_TYPE
 FW_TYPE ?= normal
 # Check that FW_TYPE is either normal or minimal
@@ -17,6 +22,25 @@ endif
 endif
 
 all: build_firmware
+
+help:
+	@echo "Available make targets:"
+	@echo "  build_firmware            Build firmware (FW_TYPE=normal|minimal)"
+	@echo "  build_and_deploy          Build firmware and flash to device"
+	@echo "  deploy                    Flash firmware to device (PORT optional)"
+	@echo "  repl_with_firmware_dir    Start REPL with firmware directory mounted"
+	@echo "  dev_exec                  Execute command with firmware mounted (CMD=...)"
+	@echo "  docker_cli_build          Build CLI-only Docker image (no Docker Desktop)"
+	@echo "  docker_cli_repl           Connect to badge via CLI-only container"
+	@echo "  convert_image             Convert image to MicroPython format"
+	@echo "  clear_hw_test_status      Remove .hw_tested_in_build from badge"
+	@echo "  micro_init                Initialize MicroPython build environment"
+	@echo "  submodules                Init git submodules"
+	@echo "  rebuild_mpy_cross          Rebuild mpy-cross"
+	@echo "  clean_frozen_py            Clean frozen mpy output"
+	@echo "  clean                      Clean ESP32 build output"
+	@echo "  bump_version               Bump version (BUMP_TYPE=patch|minor|major)"
+	@echo "  release                    Release build (requires BUMP_TYPE)"
 
 build_firmware: dist/firmware_$(FW_TYPE).bin
 
@@ -90,6 +114,27 @@ dev_exec:
 	else \
 		$(PYTHON) micropython/tools/mpremote/mpremote.py baud 460800 connect $$PORT mount -l firmware exec '$(CMD)'; \
 	fi
+
+# CLI-only Docker workflow (Linux)
+docker_cli_build:
+	@echo "Building CLI-only Docker image (no Docker Desktop required)..."
+	@$(DOCKER) build -f $(DOCKERFILE_CLI) -t $(DOCKER_IMAGE) .
+
+docker_cli_repl:
+	@echo "Starting REPL inside CLI-only Docker container..."
+	@if [ -z "$$PORT" ]; then \
+		if [ -e /dev/ttyUSB0 ]; then DEVICE=/dev/ttyUSB0; \
+		elif [ -e /dev/ttyACM0 ]; then DEVICE=/dev/ttyACM0; \
+		else echo "Error: PORT not set and no /dev/ttyUSB0 or /dev/ttyACM0 found"; exit 1; \
+		fi; \
+	else DEVICE=$$PORT; fi; \
+	$(DOCKER) run --rm -it \
+		--device=$$DEVICE \
+		--group-add dialout \
+		-v "$(PWD):/workspace" \
+		-w /workspace \
+		$(DOCKER_IMAGE) \
+		make repl_with_firmware_dir
 
          
 clean_frozen_py:
