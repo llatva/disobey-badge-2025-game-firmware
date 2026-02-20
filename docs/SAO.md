@@ -310,9 +310,9 @@ class SAOBase:
             pull: Pin.PULL_UP, Pin.PULL_DOWN, or None
         """
         if pin_num == 1 and self.gpio1 is not None:
-            pin = self.gpio1.init(mode=mode, pull=pull)
+            self.gpio1.init(mode=mode, pull=pull)
         elif pin_num == 2 and self.gpio2 is not None:
-            pin = self.gpio2.init(mode=mode, pull=pull)
+            self.gpio2.init(mode=mode, pull=pull)
         else:
             raise ValueError(f"Invalid GPIO pin number: {pin_num}")
     
@@ -1084,6 +1084,7 @@ class SoftUART:
                 return None
         
         # Wait for middle of start bit
+        # Note: Timing calibration may be necessary for reliable UART communication
         time.sleep_us(self.bit_time_us // 2)
         
         # Verify start bit
@@ -1528,6 +1529,7 @@ SAO with RGB LED controlled via I2C (e.g., using PCA9685 or similar).
 from drivers.sao_base import SAOBase
 from machine import Pin
 import time
+import asyncio
 
 
 class LEDSAODriver(SAOBase):
